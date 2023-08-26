@@ -1,6 +1,8 @@
 "use client";
 
 import { useStoreModal } from "@/hooks/use-store-modal";
+
+import { UserButton } from "@clerk/nextjs";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -13,9 +15,5 @@ export default function Home() {
     }
   }, [isOpen, onOpen]);
 
-  return (
-    <>
-      <p>Root page</p>
-    </>
-  );
+  return null;
 }

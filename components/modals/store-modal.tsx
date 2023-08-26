@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import React, { useState } from "react";
@@ -19,6 +20,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { toast } from "react-hot-toast";
 
 const StoreModal = () => {
   const storeModal = useStoreModal();
@@ -38,7 +40,18 @@ const StoreModal = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      setLoading(true);
+      // throw new Error("x");
+      const response = await axios.post("/api/stores", values);
+      window.location.assign(`/${response.data.id}`);
+      // toast.success("Store created");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,7 +73,11 @@ const StoreModal = () => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="E-Commerce" {...field} />
+                      <Input
+                        disabled={loading}
+                        placeholder="E-Commerce"
+                        {...field}
+                      />
                     </FormControl>
 
                     <FormMessage />
@@ -68,7 +85,11 @@ const StoreModal = () => {
                 )}
               />
               <div className="pt-6 space-x-2 flex justify-end w-full items-center">
-                <Button variant="outline" onClick={storeModal.onClose}>
+                <Button
+                  disabled={loading}
+                  variant="outline"
+                  onClick={storeModal.onClose}
+                >
                   Cancel
                 </Button>
 

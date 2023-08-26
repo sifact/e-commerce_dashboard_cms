@@ -1,32 +1,28 @@
-import { ClerkProvider } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs";
 
-import "../globals.css";
+import prismadb from "@/lib/prismadb";
 
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-
-import ModalProvider from "@/providers/modal-provider";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "E-commerce Dashboard",
-  description: "E-commerce Dashboard root page",
-};
-
-export default function RootLayout({
+export default async function SetupLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          <ModalProvider />
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
-  );
+  const { userId } = auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const store = await prismadb.store.findFirst({
+    where: {
+      userId,
+    },
+  });
+
+  if (store) {
+    redirect(`/${store.id}`);
+  }
+
+  return <>{children}</>;
 }
